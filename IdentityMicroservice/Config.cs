@@ -39,7 +39,7 @@ namespace IdentityMicroservice
                 {
                     ClientId = "webclient",
                     ClientName = "Web Client",
-
+                    RequireConsent = false,
                     AllowedGrantTypes = GrantTypes.HybridAndClientCredentials,
                     ClientSecrets = { new Secret("49C1A7E1-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
 
@@ -57,7 +57,7 @@ namespace IdentityMicroservice
                     ClientId = "spaclient",
                     ClientName = "SPA Client",
                     ClientUri = "https://localhost:5003",
-
+                    RequireConsent = false,
                     AllowedGrantTypes = GrantTypes.Code,
                     RequirePkce = true,
                     RequireClientSecret = false,

@@ -25,7 +25,10 @@ namespace TestApiResource
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+
+            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllers();
 
             services.AddAuthentication("Bearer")
                     .AddJwtBearer("Bearer", options =>
@@ -50,11 +53,11 @@ namespace TestApiResource
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCors("default");
 
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == "Development")
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -67,7 +70,20 @@ namespace TestApiResource
             app.UseAuthentication();
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+
+
+            // Added after upgrading to .NET Core 3.1
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
+
+            // Removed after upgrading to .NET Core 3.1
+            //app.UseMvc();
         }
     }
 }

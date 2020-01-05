@@ -17,9 +17,9 @@ namespace IdentityMicroservice
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        public IHostingEnvironment Environment { get; }
+        public IWebHostEnvironment Environment { get; }
 
-        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
             Environment = environment;
@@ -36,7 +36,8 @@ namespace IdentityMicroservice
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddMvc().SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1);
+            //services.AddMvc().SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_2_1);
+            services.AddControllersWithViews();
 
             services.Configure<IISOptions>(iis =>
             {
@@ -57,7 +58,7 @@ namespace IdentityMicroservice
                 .AddInMemoryClients(Config.GetClients())
                 .AddAspNetIdentity<ApplicationUser>();
 
-            if (Environment.IsDevelopment())
+            if (Environment.EnvironmentName == "Development")
             {
                 // Block 3:
                 // Adding Developer Signing Credential, This will generate tempkey.rsa file 
@@ -82,7 +83,7 @@ namespace IdentityMicroservice
 
         public void Configure(IApplicationBuilder app)
         {
-            if (Environment.IsDevelopment())
+            if (Environment.EnvironmentName == "Development")
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
@@ -93,11 +94,19 @@ namespace IdentityMicroservice
             }
 
             app.UseStaticFiles();
+            app.UseRouting();
             // Block 4:
             //  UseIdentityServer include a call to UseAuthentication
             app.UseIdentityServer();
+            app.UseAuthorization();
 
-            app.UseMvcWithDefaultRoute();
+            //app.UseMvcWithDefaultRoute();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }
